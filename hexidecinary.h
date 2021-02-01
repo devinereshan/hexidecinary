@@ -4,10 +4,11 @@
 #define ERR_NO_ARGS (-1)
 #define ERR_INVALID_ARG (-2)
 
-#define SIXTYFOUR_BIT
 /*
-#define THIRTYTWO_BIT
+#define SIXTYFOUR_BIT
 */
+#define THIRTYTWO_BIT
+
 #ifdef THIRTYTWO_BIT
 #define MAX_BIT_LENGTH (32) /* Maximum bits to be considered for conversion */
 #define MAX_NIBBLE_LENGTH (MAX_BIT_LENGTH / 4)

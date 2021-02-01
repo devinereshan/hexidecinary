@@ -65,16 +65,13 @@ int parse_arg(char *number) {
     if (number[0] == '0') {
         /* check for bin or hex */
         if (number[1] == 'b' || number[1] == 'B') {
-            /* TODO: consider possible errors and return them if possible */
             parse_binary(number);
             return 0;
         } else if (number[1] == 'x' || number[1] == 'X') {
-            /* TODO: consider possible errors and return them if possible */
             parse_hex(number);
             return 0;
         }
     } else if (number[0] > '0' && number[0] <= '9') {
-        /* TODO: consider possible errors and return them if possible */
         parse_decimal(number);
         return 0;
     }
@@ -83,11 +80,15 @@ int parse_arg(char *number) {
     return ERR_INVALID_ARG;
 }
 
-/* Parses the binary representation of a number and prints its hexidecimal
+/*
+ * Parses the binary representation of a number and prints its hexidecimal
  * and unsigned decimal equivalents.
- * Reads a maximum of MAX_BIT_LENGTH (32) bits.
- * Ignores spaces, but interprets any other characters as 1, except for '0',
- * which is interpreted as zero.
+ * Reads a maximum of MAX_BIT_LENGTH bits. (defined as 32 or 64 in header).
+ * Ignores all characters except for '1' and '0'.
+ * Expects *num to be prefixed with '0b' or some other two character identifier
+ * which will be discarded.
+ * Does not perform any bounds checking, but should overflow in a predictable
+ * manner.
  */
 void parse_binary(const char *num) {
     long digits[MAX_BIT_LENGTH];
@@ -112,15 +113,20 @@ void parse_binary(const char *num) {
         decimal += digits[k] << (i - (k + 1));
     }
 
-    /* TODO: replace printing original binary string new function that
-     * prints the digits array. So that meaningless digits aren't echoed
-     * back to the user.
-     */
     printf("dec: %lu\nhex: 0x%lx\nbin: ", decimal, decimal);
     print_binary(decimal);
     putchar('\n');
 }
 
+/*
+ * Parses the hexidecimal representation of a number and prints its binary and
+ * unsigned decimal equivalents.
+ * Any invalid hexidecimal digits are discarded.
+ * Expects *num to be prefixed with '0x' or some other two character identifier
+ * which will be discarded.
+ * Does not perform any bounds checking, but should overflow in a predictable
+ * manner.
+ */
 void parse_hex(const char *num) {
     long digits[MAX_NIBBLE_LENGTH];
     int i, k;
@@ -131,11 +137,16 @@ void parse_hex(const char *num) {
     num += 2;
 
     for (i = 0, c = *num; c != '\0' && i < MAX_NIBBLE_LENGTH; c = *(++num)) {
+        /* check for uppercase */
+        if (c >= 'A' && c <= 'F') {
+            c += ('a' - 'A');
+        }
         /* Compute the numeric value of the digit. */
-        if (c <= 57) {
-            c -= 48;
-        } else if (c <= 102) {
-            c -= 87;
+        if (c <= '9') {
+            c -= '0';
+        } else if (c <= 'f') {
+            /* offset of 10 for alphabetic conversions */
+            c -= ('a' - 10);
         }
 
         if (c < 16) {
@@ -156,9 +167,13 @@ void parse_hex(const char *num) {
 }
 
 /*
- * Any invalid digits will be discarded.
- * Prints an unsigned decimal representation of num.
- * Will overflow in a predictable manner relative to MAX_DEC_LENGTH
+ * Parses the decimal representation of a number and prints its hexidecimal and
+ * binary equivalents.
+ * Reads a maximum of MAX_DEC_LENGTH digits, defined as 10 or 20 in header,
+ * which allows for 32-bit or 64-bit repesentations respectively.
+ * Ignores all non-integer characters.
+ * Does not perform any bounds checking, but should overflow in a predictable
+ * manner.
  */
 void parse_decimal(const char *num) {
     long decimal;
@@ -196,9 +211,6 @@ void print_binary(long decimal) {
 
     /* clear insignificant leading zeros */
     for (mask = BIN_MASK, i = 0; (decimal & mask) == 0; mask >>= 1, i++);
-    /*
-    for (mask = 0x80000000, i = 0; (decimal & mask) == 0; mask >>= 1, i++);
-    */
 
     for (k = 0; i < MAX_BIT_LENGTH; mask >>= 1, i++, k++) {
         if (k > 0 && i % 4 == 0) {
@@ -206,6 +218,5 @@ void print_binary(long decimal) {
         }
         printf("%d", decimal & mask ? 1 : 0);
     }
-
 }
 
