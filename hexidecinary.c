@@ -9,6 +9,11 @@
 
 #include "hexidecinary.h"
 
+/* TODO:
+ * write some tests.
+ * handle negative base ten numbers
+ * man page
+ */
 
 void print_usage();
 void print_err(int err);

@@ -2,10 +2,10 @@
 #define HEXIDECINARY_H
 
 
-/*
 #define SIXTYFOUR_BIT
-*/
+/*
 #define THIRTYTWO_BIT
+*/
 
 #ifdef THIRTYTWO_BIT
 #define MAX_BIT_LENGTH (32) /* Maximum bits to be considered for conversion */
