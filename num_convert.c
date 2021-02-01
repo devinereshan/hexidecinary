@@ -66,6 +66,8 @@ int parse_arg(char *number) {
         /* check for bin or hex */
         if (number[1] == 'b' || number[1] == 'B') {
             /* TODO: call binary function */
+            parse_binary(number);
+            return 0;
         } else if (number[1] == 'x' || number[1] == 'X') {
             /* TODO: call hex function */
         }
@@ -76,3 +78,39 @@ int parse_arg(char *number) {
     /* Otherwise, not a valid number representation */
     return ERR_INVALID_ARG;
 }
+
+/* Parses the binary representation of a number and prints it's hexidecimal
+ * and unsigned decimal equivalents.
+ * Reads a maximum of MAX_BIT_LENGTH (32) bits.
+ * Ignores spaces, but interprets any other characters as 1, except for '0',
+ * which is interpreted as zero.
+ */
+void parse_binary(char *number) {
+    int digits[MAX_BIT_LENGTH];
+    int i, k;
+    char c;
+    int decimal;
+    char *original_num;
+
+    original_num = number;
+
+    /* skip the leading '0b' */
+    number += 2;
+
+    for (i = 0, c = *number; i < MAX_BIT_LENGTH && c != '\0'; i++, c = *(++number)) {
+        while(c == ' ') {
+            c = *(++number);
+        }
+        digits[i] = c == '0' ? 0 : 1;
+    }
+
+    decimal = 0;
+    for (k = 0; k < i; k++) {
+        decimal += digits[k] << (i - (k + 1));
+    }
+
+    printf("dec: %u\nhex: 0x%x\nbin: %s\n", decimal, decimal, original_num);
+}
+
+
+
