@@ -1,5 +1,5 @@
-#ifndef NUM_CONVERT_H
-#define NUM_CONVERT_H
+#ifndef HEXIDECINARY_H
+#define HEXIDECINARY_H
 
 #define ERR_NO_ARGS (-1)
 #define ERR_INVALID_ARG (-2)

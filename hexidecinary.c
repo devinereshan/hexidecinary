@@ -7,7 +7,7 @@
  */
 #include <stdio.h>
 
-#include "num_convert.h"
+#include "hexidecinary.h"
 
 
 void print_usage();
