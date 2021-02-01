@@ -70,6 +70,8 @@ int parse_arg(char *number) {
             return 0;
         } else if (number[1] == 'x' || number[1] == 'X') {
             /* TODO: call hex function */
+            parse_hex(number);
+            return 0;
         }
     } else if (number[0] > '0' && number[0] <= '9') {
         /* TODO: call decimal function */
@@ -79,29 +81,31 @@ int parse_arg(char *number) {
     return ERR_INVALID_ARG;
 }
 
-/* Parses the binary representation of a number and prints it's hexidecimal
+/* Parses the binary representation of a number and prints its hexidecimal
  * and unsigned decimal equivalents.
  * Reads a maximum of MAX_BIT_LENGTH (32) bits.
  * Ignores spaces, but interprets any other characters as 1, except for '0',
  * which is interpreted as zero.
  */
-void parse_binary(char *number) {
+void parse_binary(const char *num) {
     int digits[MAX_BIT_LENGTH];
     int i, k;
     char c;
     int decimal;
-    char *original_num;
+    const char *orig_num;
 
-    original_num = number;
+    orig_num = num;
 
     /* skip the leading '0b' */
-    number += 2;
+    num += 2;
 
-    for (i = 0, c = *number; i < MAX_BIT_LENGTH && c != '\0'; i++, c = *(++number)) {
-        while(c == ' ') {
-            c = *(++number);
+    for (i = 0, c = *num; i < MAX_BIT_LENGTH && c != '\0'; c = *(++num)) {
+        /* ignore everything except '1' or '0' */
+        if (c == '0') {
+            digits[i++] = 0;
+        } else if (c == '1') {
+            digits[i++] = 1;
         }
-        digits[i] = c == '0' ? 0 : 1;
     }
 
     decimal = 0;
@@ -109,8 +113,49 @@ void parse_binary(char *number) {
         decimal += digits[k] << (i - (k + 1));
     }
 
-    printf("dec: %u\nhex: 0x%x\nbin: %s\n", decimal, decimal, original_num);
+    /* TODO: replace printing original binary string new function that
+     * prints the digits array. So that meaningless digits aren't echoed
+     * back to the user.
+     */
+    printf("dec: %u\nhex: 0x%x\nbin: %s\n", decimal, decimal, orig_num);
 }
 
+void parse_hex(const char *num) {
+    int digits[MAX_NIBBLE_LENGTH];
+    int i, k;
+    unsigned char c;
+    int decimal;
+    const char *orig_num;
 
+    orig_num = num;
+
+    /* skip the leading '0x' */
+    num += 2;
+
+    for (i = 0, c = *num; i < MAX_NIBBLE_LENGTH && c != '\0'; c = *(++num)) {
+        /* Compute the numeric value of the digit. */
+        if (c <= 57) {
+            c -= 48;
+        } else if (c <= 102) {
+            c -= 87;
+        }
+
+        if (c < 16) {
+            digits[i++] = (int) c;
+        }
+    }
+
+    decimal = 0;
+    for (k = 0; k < i; k++) {
+        /* bit shift each digit by 4 * it's magnitude */
+        decimal += digits[k] << ((i - (k + 1)) * 4);
+    }
+
+    /* TODO: print binary */
+    printf("dec: %u\nhex: 0x%x\n", decimal, decimal);
+}
+
+void print_binary(int decimal) {
+
+}
 
