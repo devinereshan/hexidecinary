@@ -65,16 +65,18 @@ int parse_arg(char *number) {
     if (number[0] == '0') {
         /* check for bin or hex */
         if (number[1] == 'b' || number[1] == 'B') {
-            /* TODO: call binary function */
+            /* TODO: consider possible errors and return them if possible */
             parse_binary(number);
             return 0;
         } else if (number[1] == 'x' || number[1] == 'X') {
-            /* TODO: call hex function */
+            /* TODO: consider possible errors and return them if possible */
             parse_hex(number);
             return 0;
         }
     } else if (number[0] > '0' && number[0] <= '9') {
-        /* TODO: call decimal function */
+        /* TODO: consider possible errors and return them if possible */
+        parse_decimal(number);
+        return 0;
     }
 
     /* Otherwise, not a valid number representation */
@@ -88,18 +90,15 @@ int parse_arg(char *number) {
  * which is interpreted as zero.
  */
 void parse_binary(const char *num) {
-    int digits[MAX_BIT_LENGTH];
+    long digits[MAX_BIT_LENGTH];
     int i, k;
     char c;
-    int decimal;
-    const char *orig_num;
-
-    orig_num = num;
+    long decimal;
 
     /* skip the leading '0b' */
     num += 2;
 
-    for (i = 0, c = *num; i < MAX_BIT_LENGTH && c != '\0'; c = *(++num)) {
+    for (i = 0, c = *num; c != '\0' && i < MAX_BIT_LENGTH; c = *(++num)) {
         /* ignore everything except '1' or '0' */
         if (c == '0') {
             digits[i++] = 0;
@@ -117,22 +116,21 @@ void parse_binary(const char *num) {
      * prints the digits array. So that meaningless digits aren't echoed
      * back to the user.
      */
-    printf("dec: %u\nhex: 0x%x\nbin: %s\n", decimal, decimal, orig_num);
+    printf("dec: %lu\nhex: 0x%lx\nbin: ", decimal, decimal);
+    print_binary(decimal);
+    putchar('\n');
 }
 
 void parse_hex(const char *num) {
-    int digits[MAX_NIBBLE_LENGTH];
+    long digits[MAX_NIBBLE_LENGTH];
     int i, k;
     unsigned char c;
-    int decimal;
-    const char *orig_num;
-
-    orig_num = num;
+    long decimal;
 
     /* skip the leading '0x' */
     num += 2;
 
-    for (i = 0, c = *num; i < MAX_NIBBLE_LENGTH && c != '\0'; c = *(++num)) {
+    for (i = 0, c = *num; c != '\0' && i < MAX_NIBBLE_LENGTH; c = *(++num)) {
         /* Compute the numeric value of the digit. */
         if (c <= 57) {
             c -= 48;
@@ -147,15 +145,67 @@ void parse_hex(const char *num) {
 
     decimal = 0;
     for (k = 0; k < i; k++) {
-        /* bit shift each digit by 4 * it's magnitude */
+        /* bit shift each digit by 4 * its magnitude */
         decimal += digits[k] << ((i - (k + 1)) * 4);
     }
 
-    /* TODO: print binary */
-    printf("dec: %u\nhex: 0x%x\n", decimal, decimal);
+    printf("dec: %lu\nhex: 0x%lx\nbin: ", decimal, decimal);
+
+    print_binary(decimal);
+    putchar('\n');
 }
 
-void print_binary(int decimal) {
+/*
+ * Any invalid digits will be discarded.
+ * Prints an unsigned decimal representation of num.
+ * Will overflow in a predictable manner relative to MAX_DEC_LENGTH
+ */
+void parse_decimal(const char *num) {
+    long decimal;
+    long digits[MAX_DEC_LENGTH];
+    int i;
+    long k;
+    unsigned char c;
+
+    for (i = 0, c = *num; *num != '\0' && i < MAX_DEC_LENGTH; c = *(++num)) {
+        if (c >= '0' && c <= '9') {
+            digits[i++] = c - '0';
+        }
+    }
+
+    for (decimal = 0, k = 1; i > 0;) {
+        decimal += digits[--i] * k;
+        k *= 10;
+    }
+
+    printf("dec: %lu\nhex: 0x%lx\nbin: ", decimal, decimal);
+
+    print_binary(decimal);
+    putchar('\n');
+}
+
+void print_binary(long decimal) {
+    unsigned long mask;
+    int i, k;
+
+    printf("0b");
+    if (decimal == 0) {
+        putchar('0');
+        return;
+    }
+
+    /* clear insignificant leading zeros */
+    for (mask = BIN_MASK, i = 0; (decimal & mask) == 0; mask >>= 1, i++);
+    /*
+    for (mask = 0x80000000, i = 0; (decimal & mask) == 0; mask >>= 1, i++);
+    */
+
+    for (k = 0; i < MAX_BIT_LENGTH; mask >>= 1, i++, k++) {
+        if (k > 0 && i % 4 == 0) {
+            putchar(' ');
+        }
+        printf("%d", decimal & mask ? 1 : 0);
+    }
 
 }
 

@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-ansi -pedantic -Wall
+CFLAGS=-g3 -ansi -pedantic -Wall
 OUTDIR=./bin
 PROGNAME=hexidecinary
 
