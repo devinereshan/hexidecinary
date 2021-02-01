@@ -26,13 +26,23 @@ int main(int argc, char **argv) {
         return err;
     }
 
+    if (argv[1][0] == '-' && (err = parse_flags(argv[0], argv[1])) < 0) {
+        print_err(err);
+        if (err == EXIT_EARLY_NO_ERR) {
+            return 0;
+        } else {
+            print_usage(argv[0]);
+            return err;
+        }
+    }
+
     number = argv[1];
 
     if (number[0] == '\0') {
         err = ERR_INVALID_ARG;
         print_err(err);
         print_usage(argv[0]);
-        return ERR_INVALID_ARG;
+        return err;
     }
 
     /* check for help flag */
@@ -57,9 +67,51 @@ void print_usage(const char *prog) {
 }
 
 void print_err(int err) {
-    printf("ERROR: %s\n", err_messages[-err]);
+    if (err == EXIT_EARLY_NO_ERR) {
+        printf("%s\n", err_message[-err]);
+    } else {
+        printf("ERROR: %s\n", err_message[-err]);
+    }
 }
 
+int print_help(const char *prog) {
+    FILE *helptext;
+    char line[128];
+
+    print_usage(prog);
+
+    /* temp until man page is written */
+    helptext = fopen("help.txt", "r");
+    if (!helptext) {
+        printf("File 'help.txt' unavailable");
+        return ERR_FILE_OPEN_FAIL;
+    }
+
+    while(fgets(line, 128, helptext)) {
+        printf("%s", line);
+    }
+
+    fclose(helptext);
+
+    return EXIT_EARLY_NO_ERR;
+}
+
+int parse_flags(const char *prog, const char *flag) {
+    char c;
+    int err;
+
+    /* clear leading '-' */
+    while ((c = *(flag++)) == '-');
+
+    switch(c) {
+        case 'h':
+            err = print_help(prog);
+            return err;
+        default:
+            printf("Cannot parse argument '%c'.\n", c);
+            return ERR_INVALID_FLAG;
+    }
+}
 
 int parse_arg(char *number) {
     if (number[0] == '0') {

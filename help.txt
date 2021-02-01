@@ -1,0 +1,27 @@
+
+Decimal:
+  If the first character of <number> is a non-zero integer value (1-9), then it
+  will be interpreted as a base-ten number. Any subsequent non-integer digits
+  will be discarded without affecting the decimal interpretation. '1024',
+  '1,024', and '1.  024' are valid formats that will all evalutate to the same
+  number. '01,024' is an invalid format and will not be parsed.
+
+Hexidecimal:
+  If <number> is prefixed by '0x' or '0X', then it will be interpreted as a
+  base-sixteen number. Any subsequent digits in the ranges 0-9 and a-f will be
+  interpreted. Letters may be uppercase or lowercase. Any digits following
+  outside of the valid range will be discarded without effect. '0x1f', '0x01F',
+  and '0xY0 1F' will all evaluate to the same number.
+
+Binary:
+  If <number> is prefixed by '0b' or '0B', then it will be interpreted as a
+  base-two number. Any subsequent '0' or '1' will be interpreted. All other
+  characters will be discarded without effect. '0b1010', '0b 10 10', and
+  '0b0000 1010' will all evaluate to the same number.
+
+Overflow:
+  <number> can hold at most MAX_BIT_LENGTH bits, which is defined in the
+  program header (either 32 or 64). If <number> is too large to fit in the
+  available bits, it will overflow in a predictable manner as an unsigned data
+  type.
+

@@ -1,8 +1,6 @@
 #ifndef HEXIDECINARY_H
 #define HEXIDECINARY_H
 
-#define ERR_NO_ARGS (-1)
-#define ERR_INVALID_ARG (-2)
 
 /*
 #define SIXTYFOUR_BIT
@@ -24,14 +22,25 @@
 #endif
 
 
-const char *err_messages[] = {
+#define ERR_NO_ARGS (-1)
+#define ERR_INVALID_ARG (-2)
+#define EXIT_EARLY_NO_ERR (-3)
+#define ERR_INVALID_FLAG (-4)
+#define ERR_FILE_OPEN_FAIL (-5)
+
+const char *err_message[] = {
     "Unknown error.",
     "Too few arguments.",
-    "Invalid argument(s)."
+    "Invalid argument(s).",
+    "Program completed successfully.",
+    "Invalid flag.",
+    "Unable to open file."
 };
 
 void print_usage();
 void print_err(int err);
+int print_help(const char *prog);
+int parse_flags(const char *prog, const char *flag);
 int parse_arg(char *number);
 void parse_binary(const char *number);
 void parse_hex(const char *number);
