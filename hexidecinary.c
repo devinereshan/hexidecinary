@@ -45,9 +45,6 @@ int main(int argc, char **argv) {
         return err;
     }
 
-    /* check for help flag */
-    /* TODO */
-
     if ((err = parse_arg(number)) < 0) {
         print_err(err);
         print_usage(argv[0]);

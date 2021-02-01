@@ -11,7 +11,7 @@
 #define MAX_BIT_LENGTH (32) /* Maximum bits to be considered for conversion */
 #define MAX_NIBBLE_LENGTH (MAX_BIT_LENGTH / 4)
 #define MAX_DEC_LENGTH (10)
-#define BIN_MASK (0x800000000)
+#define BIN_MASK (0x80000000)
 #endif
 
 #ifdef SIXTYFOUR_BIT
