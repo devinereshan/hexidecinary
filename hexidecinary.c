@@ -62,9 +62,9 @@ int main(int argc, char **argv) {
 void print_usage(const char *prog) {
     printf("Usage:\n  %s <number>\n"
             "\n<number> must be a valid decimal, binary, or"
-            "\nhexadecimal representation of a 32-bit number."
+            "\nhexadecimal representation of a %d-bit number."
             "\n\nType: '%s -h' or '%s --help' for more information.\n",
-            prog, prog, prog);
+            prog, MAX_BIT_LENGTH, prog, prog);
 
 }
 
@@ -72,7 +72,7 @@ void print_err(int err) {
     if (err == EXIT_EARLY_NO_ERR) {
         printf("%s\n", err_message[-err]);
     } else {
-        printf("ERROR: %s\n", err_message[-err]);
+        fprintf(stderr, "ERROR: %s\n", err_message[-err]);
     }
 }
 
@@ -85,7 +85,7 @@ int print_help(const char *prog) {
     /* temp until man page is written */
     helptext = fopen("help.txt", "r");
     if (!helptext) {
-        printf("File 'help.txt' unavailable");
+        fprintf(stderr, "File 'help.txt' unavailable");
         return ERR_FILE_OPEN_FAIL;
     }
 
@@ -110,7 +110,7 @@ int parse_flags(const char *prog, const char *flag) {
             err = print_help(prog);
             return err;
         default:
-            printf("Cannot parse argument '%c'.\n", c);
+            fprintf(stderr, "Cannot parse argument '%c'.\n", c);
             return ERR_INVALID_FLAG;
     }
 }
