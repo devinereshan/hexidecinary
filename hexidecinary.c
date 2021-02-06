@@ -13,11 +13,9 @@
  * write some tests.
  * handle negative base ten numbers
  * man page
+ * Interactive mode
+ * handle 0
  */
-
-void print_usage();
-void print_err(int err);
-int parse_arg(char *number);
 
 int main(int argc, char **argv) {
     int err;
@@ -118,10 +116,11 @@ int parse_flags(const char *prog, const char *flag) {
 int parse_arg(char *number) {
     if (number[0] == '0') {
         /* check for bin or hex */
-        if (number[1] == 'b' || number[1] == 'B') {
+        /* lowercase same as upper, but have bit 0x20 set */
+        if ((number[1] | 0x20) == 'b') {
             parse_binary(number);
             return 0;
-        } else if (number[1] == 'x' || number[1] == 'X') {
+        } else if ((number[1] | 0x20) == 'x') {
             parse_hex(number);
             return 0;
         }
@@ -191,10 +190,9 @@ void parse_hex(const char *num) {
     num += 2;
 
     for (i = 0, c = *num; c != '\0' && i < MAX_NIBBLE_LENGTH; c = *(++num)) {
-        /* check for uppercase */
-        if (c >= 'A' && c <= 'F') {
-            c += ('a' - 'A');
-        }
+        /* set lowercase. Ensure bit 0x20 is set. No effect for numerics. */
+        c |= 0x20;
+
         /* Compute the numeric value of the digit. */
         if (c <= '9') {
             c -= '0';
