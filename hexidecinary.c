@@ -15,6 +15,7 @@
  * man page
  * Interactive mode
  * handle 0
+ * octal
  */
 
 int main(int argc, char **argv) {
